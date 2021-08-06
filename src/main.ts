@@ -49,19 +49,22 @@ async function loadStations(): Promise<void> {
   clearChildElements(stationsListElement);
   if (stations.length == 0) {
     stationsListElement.classList.add('stations--hidden');
+  } else if (stations.length == 1) {
+    stationsListElement.classList.add('stations--hidden');
+    loadTimetable(stations[0]);
   } else {
     stationsListElement.classList.remove('stations--hidden');
-  }
 
-  stations.forEach((station) => {
-    const stationListItem = createElement('a', {
-      innerText: station.name,
-      id: `station${station.id}`,
-      className: 'station__item',
+    stations.forEach((station) => {
+      const stationListItem = createElement('a', {
+        innerText: station.name,
+        id: `station${station.id}`,
+        className: 'station__item',
+      });
+      stationsListElement.append(stationListItem);
+      stationListItem?.addEventListener('click', () => loadTimetable(station));
     });
-    stationsListElement.append(stationListItem);
-    stationListItem?.addEventListener('click', () => loadTimetable(station));
-  });
+  }
 }
 
 async function loadTimetable({ id, name }: Station) {
@@ -85,18 +88,28 @@ async function loadTimetable({ id, name }: Station) {
 
       const nextStops = departureTrainNextStops.map((trainStop) => {
         const trainStopElement = createElement('a', { innerText: trainStop });
-        trainStopElement?.addEventListener('click', () =>
-          console.log(trainStop)
-        );
+        trainStopElement?.addEventListener('click', () => {
+          searchElement.value = trainStop;
+          loadStations();
+        });
         return trainStopElement;
+      });
+
+      const destination = createElement('a', {
+        innerText: departureDestination,
+      });
+      destination?.addEventListener('click', () => {
+        searchElement.value = departureDestination;
+        loadStations();
       });
 
       timeTableElement.append(
         createElement('div', { innerText: departureTime }),
         createElement('div', { innerText: departureTrainNumber }),
         createElement('div', {
-          innerText: departureDestination,
+          className: 'destination',
           childElements: [
+            destination,
             createElement('div', {
               className: 'nextStops',
               childElements: nextStops,

@@ -32,8 +32,12 @@ export async function getTimetable(
   dateYYMMDD: string,
   hour: number
 ): Promise<TimetableItem[]> {
+  // API has a bug and does not accept values below 10
+  if (hour < 11) hour = 11;
   const urlBase = import.meta.env.VITE_API_TIMETABLE_URL;
-  const url = `${urlBase}/${locationId}/${dateYYMMDD}/${hour.toString()}`;
+  const url = `${urlBase}/${locationId}/${dateYYMMDD}/${
+    hour < 10 ? '0' + hour.toString() : hour.toString()
+  }`;
   const apiKey = import.meta.env.VITE_API_KEY;
 
   const response = await fetch(url, {

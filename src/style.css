@@ -67,6 +67,14 @@
   margin-top: 1rem;
 }
 
+.destination a {
+  cursor: pointer;
+}
+
+.destination a:hover {
+  color: var(--clr-accent);
+}
+
 .nextStops {
   font-size: 70%;
 }

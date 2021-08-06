@@ -22,7 +22,9 @@ export async function getStations(location: string): Promise<Station[]> {
   return results;
 }
 
-export async function getTimetable(locationId: string) {
+export async function getTimetable(
+  locationId: string
+): Promise<TimetableItem[]> {
   const date = '210806';
   const hour = '18';
   const urlBase = import.meta.env.VITE_API_TIMETABLE_URL;

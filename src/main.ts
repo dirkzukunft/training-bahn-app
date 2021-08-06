@@ -1,57 +1,64 @@
 import './style.css';
 import { getStations, getTimetable } from '../utils/api-bahn';
 import { createElement } from '../utils/createElement';
+import { clearChildElements } from '../utils/clearChildElements';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
-const selectStation = createElement('section', {
+const resultElement = createElement('div', {
+  id: 'result',
+});
+
+const searchElement = createElement('input', {
+  type: 'text',
+  id: 'search',
+  name: 'search',
+  className: 'search',
+  oninput: loadStations,
+});
+
+const stationsListElement = createElement('div', {
+  id: 'stations',
+  className: 'stations',
+});
+
+const appBody = createElement('section', {
+  className: 'wrapper',
   childElements: [
     createElement('label', {
       innerText: 'Bahnhof:',
-      childElements: [
-        createElement('input', {
-          type: 'text',
-          id: 'search',
-          name: 'search',
-          oninput: loadStations,
-        }),
-      ],
     }),
     createElement('div', {
-      id: 'stations',
+      childElements: [searchElement, stationsListElement],
     }),
-    createElement('div', {
-      id: 'result',
-    }),
+    resultElement,
   ],
 });
 
-//console.log(await getTimetable('8010209'));
-
 if (app !== null) {
-  app.append(selectStation);
-  document.querySelector('#search')?.setAttribute('list', 'stationsList');
+  app.append(appBody);
 }
 
-async function loadStations() {
-  const searchElement = <HTMLInputElement>document.querySelector('#search');
+async function loadStations(): Promise<void> {
   const search = searchElement.value;
-  const stationsList = <HTMLElement>document.querySelector('#stations');
-
   const stations = await getStations(search);
 
-  while (stationsList.firstChild) {
-    stationsList.removeChild(stationsList.firstChild);
-  }
-  stations.map((station) =>
-    stationsList.append(
-      createElement('a', {
-        innerText: station.name,
-        id: station.id,
-        class: 'station',
-      })
-    )
-  );
+  clearChildElements(stationsListElement);
+
+  stations.map((station) => {
+    const stationListItem = createElement('a', {
+      innerText: station.name,
+      id: `station${station.id}`,
+      className: 'station__item',
+    });
+    stationsListElement.append(stationListItem);
+    stationListItem?.addEventListener('click', () => loadTimetable(station.id));
+  });
+}
+
+async function loadTimetable(id: string) {
+  console.log(id);
+  console.log(await getTimetable(id));
 }
 
 //   const result = <HTMLDivElement>document.querySelector('#result');

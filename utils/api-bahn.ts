@@ -1,6 +1,6 @@
 import { StationRoot, Station } from '../src/types/stations';
 import { TimetableAPIObject, TimetableItem } from '../src/types/timetable';
-import { XML2JSON } from './xml2json';
+import { xml2json } from './xml2json';
 
 export async function getStations(location: string): Promise<Station[]> {
   if (!location) return [];
@@ -40,7 +40,7 @@ export async function getTimetable(
     headers: { Authorization: 'Bearer ' + apiKey },
   });
   const dataXML = await response.text();
-  const data: TimetableAPIObject = await XML2JSON(dataXML);
+  const data: TimetableAPIObject = await xml2json(dataXML);
 
   const results: TimetableItem[] = data.timetable.s.map((resultElement) => {
     return {

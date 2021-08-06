@@ -1,3 +1,15 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --clr-border: #aaa;
+  --clr-accent: #3a86ff;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -5,4 +17,40 @@
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.search {
+  margin-left: 1rem;
+  padding: 0.5em;
+  width: 20rem;
+  height: 2rem;
+  font-size: 1rem;
+  border: 1px solid var(--clr-border);
+}
+
+.stations {
+  position: absolute;
+  margin-left: -20rem;
+  margin-top: 2rem;
+  width: 20rem;
+  display: inline-block;
+  overflow-y: auto;
+  max-height: 50vh;
+  z-index: 1;
+  border: 1px solid var(--clr-border);
+  cursor: pointer;
+}
+
+.station__item {
+  display: block;
+  text-align: left;
+  padding: 0 1em;
+}
+
+.station__item:hover {
+  color: var(--clr-accent);
 }

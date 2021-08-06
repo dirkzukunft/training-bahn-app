@@ -3,6 +3,8 @@ import { TimetableAPIObject, TimetableItem } from '../src/types/timetable';
 import { XML2JSON } from './xml2json';
 
 export async function getStations(location: string): Promise<Station[]> {
+  if (!location) return [];
+
   const urlBase = import.meta.env.VITE_API_STATIONS_URL;
   const url = `${urlBase}?searchstring=*${location}*&limit=100`;
   const apiKey = import.meta.env.VITE_API_KEY;
@@ -10,16 +12,19 @@ export async function getStations(location: string): Promise<Station[]> {
   const response = await fetch(url, {
     headers: { Authorization: 'Bearer ' + apiKey },
   });
-  const data: StationRoot = await response.json();
 
-  const results: Station[] = data.result.map((resultElement) => {
-    return {
-      name: resultElement.name,
-      id: resultElement.evaNumbers[0].number.toString(),
-    };
-  });
-
-  return results;
+  if (response.status == 200) {
+    const data: StationRoot = await response.json();
+    const results: Station[] = data.result.map((resultElement) => {
+      return {
+        name: resultElement.name,
+        id: resultElement.evaNumbers[0].number.toString(),
+      };
+    });
+    return results;
+  } else {
+    return [];
+  }
 }
 
 export async function getTimetable(

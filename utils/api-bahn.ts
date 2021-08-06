@@ -42,22 +42,46 @@ export async function getTimetable(
   const dataXML = await response.text();
   const data: TimetableAPIObject = await xml2json(dataXML);
 
-  const results: TimetableItem[] = data.timetable.s.map((resultElement) => {
-    return {
-      year: resultElement.dp.pt.slice(0, 2),
-      month: resultElement.dp.pt.slice(2, 4),
-      day: resultElement.dp.pt.slice(4, 6),
-      hour: resultElement.dp.pt.slice(6, 8),
-      minute: resultElement.dp.pt.slice(8, 10),
-      destination: resultElement.dp.ppth.split('|').slice(-1)[0],
-      trainNumber: `${resultElement.tl.c} ${resultElement.dp.l}`,
-      nextStops: resultElement.dp.ppth.split('|'),
-    };
-  });
+  const results: TimetableItem[] = [];
 
-  results.sort((a, b) =>
-    a.minute > b.minute ? 1 : b.minute > a.minute ? -1 : 0
-  );
+  if (
+    'timetable' in data &&
+    's' in data.timetable &&
+    data.timetable.s.length > 0
+  ) {
+    data.timetable.s.forEach((resultElement) => {
+      if (resultElement.dp && resultElement.tl) {
+        results.push({
+          year: resultElement.dp.pt.slice(0, 2),
+          month: resultElement.dp.pt.slice(2, 4),
+          day: resultElement.dp.pt.slice(4, 6),
+          hour: resultElement.dp.pt.slice(6, 8),
+          minute: resultElement.dp.pt.slice(8, 10),
+          destination: resultElement.dp.ppth.split('|').slice(-1)[0],
+          trainNumber: `${resultElement.tl.c ?? ''} ${
+            resultElement.dp.l ?? ''
+          }`,
+          nextStops: resultElement.dp.ppth.split('|'),
+        });
+      }
+    });
+
+    results.sort((a, b) => {
+      if (
+        parseInt(a.hour) * 100 + parseInt(a.minute) >
+        parseInt(b.hour) * 100 + parseInt(b.minute)
+      ) {
+        return 1;
+      } else if (
+        parseInt(a.hour) * 100 + parseInt(a.minute) <
+        parseInt(b.hour) * 100 + parseInt(b.minute)
+      ) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+  }
 
   return results;
 }

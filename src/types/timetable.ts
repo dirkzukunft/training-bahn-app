@@ -25,12 +25,12 @@ export type Timetable = {
 export type TimetableElement = {
   id: string;
   tl: TimetableTl;
-  ar: TimetableAr;
-  dp: TimetableDp;
+  ar?: TimetableAr;
+  dp?: TimetableDp;
 };
 
 export type TimetableTl = {
-  f: string;
+  f?: string;
   t: string;
   o: string;
   c: string;
@@ -43,6 +43,8 @@ export type TimetableAr = {
   l: string;
   ppth: string;
   wings?: string;
+  pde?: string;
+  tra?: string;
 };
 
 export type TimetableDp = {
@@ -52,4 +54,5 @@ export type TimetableDp = {
   ppth: string;
   wings?: string;
   pde?: string;
+  tra?: string;
 };

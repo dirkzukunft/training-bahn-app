@@ -67,10 +67,14 @@
   margin-top: 1rem;
 }
 
-.timeTable * {
-  text-align: left;
-}
-
 .nextStops {
   font-size: 70%;
+}
+
+.nextStops a::after {
+  content: ' - ';
+}
+
+.nextStops a:last-of-type::after {
+  content: '';
 }

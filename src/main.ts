@@ -65,8 +65,9 @@ async function loadStations(): Promise<void> {
 }
 
 async function loadTimetable({ id, name }: Station) {
-  clearChildElements(stationsListElement);
   clearChildElements(timeTableElement);
+  clearChildElements(stationsListElement);
+  stationsListElement.classList.add('stations--hidden');
   searchElement.value = name;
 
   const date = new Date();
@@ -74,27 +75,39 @@ async function loadTimetable({ id, name }: Station) {
   const yymmdd = date.toISOString().slice(2, 10).replaceAll('-', '');
 
   const timeTableData = await getTimetable(id, yymmdd, hour);
-  timeTableData.forEach((timeTableItem) => {
-    const departureTime = `${timeTableItem.hour}:${timeTableItem.minute}`;
-    const departureTrainNumber = timeTableItem.trainNumber;
-    const departureDestination = timeTableItem.destination;
-    const departureTrainNextStops = timeTableItem.nextStops.join(' - ');
 
+  if (timeTableData.length > 0) {
+    timeTableData.forEach((timeTableItem) => {
+      const departureTime = `${timeTableItem.hour}:${timeTableItem.minute}`;
+      const departureTrainNumber = timeTableItem.trainNumber;
+      const departureDestination = timeTableItem.destination;
+      const departureTrainNextStops = timeTableItem.nextStops;
+
+      const nextStops = departureTrainNextStops.map((trainStop) => {
+        const trainStopElement = createElement('a', { innerText: trainStop });
+        trainStopElement?.addEventListener('click', () =>
+          console.log(trainStop)
+        );
+        return trainStopElement;
+      });
+
+      timeTableElement.append(
+        createElement('div', { innerText: departureTime }),
+        createElement('div', { innerText: departureTrainNumber }),
+        createElement('div', {
+          innerText: departureDestination,
+          childElements: [
+            createElement('div', {
+              className: 'nextStops',
+              childElements: nextStops,
+            }),
+          ],
+        })
+      );
+    });
+  } else {
     timeTableElement.append(
-      createElement('div', { innerText: departureTime }),
-      createElement('div', { innerText: departureTrainNumber }),
-      createElement('div', {
-        innerText: departureDestination,
-        childElements: [
-          createElement('div', {
-            innerText: departureTrainNextStops,
-            className: 'nextStops',
-          }),
-        ],
-      })
+      createElement('div', { innerText: 'Keine Abfahrten' })
     );
-  });
-
-  if (timeTableData.length > 0)
-    stationsListElement.classList.add('stations--hidden');
+  }
 }

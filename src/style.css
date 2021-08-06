@@ -14,17 +14,16 @@
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 
 .wrapper {
   position: relative;
+  margin: auto;
+  max-width: 800px;
+  padding: 2rem;
 }
 
 .search {
-  margin-left: 1rem;
   padding: 0.5em;
   width: 20rem;
   height: 2rem;
@@ -42,15 +41,36 @@
   max-height: 50vh;
   z-index: 1;
   border: 1px solid var(--clr-border);
+  background-color: #fff;
   cursor: pointer;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+}
+
+.stations--hidden {
+  display: none;
 }
 
 .station__item {
   display: block;
   text-align: left;
-  padding: 0 1em;
+  padding: 0 0.5rem;
 }
 
 .station__item:hover {
   color: var(--clr-accent);
+}
+
+.timeTable {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.5rem 1rem;
+  margin-top: 1rem;
+}
+
+.timeTable * {
+  text-align: left;
+}
+
+.nextStops {
+  font-size: 70%;
 }

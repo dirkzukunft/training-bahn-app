@@ -28,12 +28,12 @@ export async function getStations(location: string): Promise<Station[]> {
 }
 
 export async function getTimetable(
-  locationId: string
+  locationId: string,
+  dateYYMMDD: string,
+  hour: number
 ): Promise<TimetableItem[]> {
-  const date = '210806';
-  const hour = '18';
   const urlBase = import.meta.env.VITE_API_TIMETABLE_URL;
-  const url = `${urlBase}/${locationId}/${date}/${hour}`;
+  const url = `${urlBase}/${locationId}/${dateYYMMDD}/${hour.toString()}`;
   const apiKey = import.meta.env.VITE_API_KEY;
 
   const response = await fetch(url, {
@@ -54,6 +54,10 @@ export async function getTimetable(
       nextStops: resultElement.dp.ppth.split('|'),
     };
   });
+
+  results.sort((a, b) =>
+    a.minute > b.minute ? 1 : b.minute > a.minute ? -1 : 0
+  );
 
   return results;
 }

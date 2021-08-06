@@ -2,11 +2,13 @@ import './style.css';
 import { getStations, getTimetable } from '../utils/api-bahn';
 import { createElement } from '../utils/createElement';
 import { clearChildElements } from '../utils/clearChildElements';
+import { Station } from './types/stations';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
-const resultElement = createElement('div', {
-  id: 'result',
+const timeTableElement = createElement('div', {
+  id: 'timeTable',
+  className: 'timeTable',
 });
 
 const searchElement = createElement('input', {
@@ -19,8 +21,9 @@ const searchElement = createElement('input', {
 
 const stationsListElement = createElement('div', {
   id: 'stations',
-  className: 'stations',
+  className: 'stations stations--hidden',
 });
+searchElement.addEventListener('focusin', () => (searchElement.value = ''));
 
 const appBody = createElement('section', {
   className: 'wrapper',
@@ -31,7 +34,7 @@ const appBody = createElement('section', {
     createElement('div', {
       childElements: [searchElement, stationsListElement],
     }),
-    resultElement,
+    timeTableElement,
   ],
 });
 
@@ -44,21 +47,54 @@ async function loadStations(): Promise<void> {
   const stations = await getStations(search);
 
   clearChildElements(stationsListElement);
+  if (stations.length == 0) {
+    stationsListElement.classList.add('stations--hidden');
+  } else {
+    stationsListElement.classList.remove('stations--hidden');
+  }
 
-  stations.map((station) => {
+  stations.forEach((station) => {
     const stationListItem = createElement('a', {
       innerText: station.name,
       id: `station${station.id}`,
       className: 'station__item',
     });
     stationsListElement.append(stationListItem);
-    stationListItem?.addEventListener('click', () => loadTimetable(station.id));
+    stationListItem?.addEventListener('click', () => loadTimetable(station));
   });
 }
 
-async function loadTimetable(id: string) {
-  console.log(id);
-  console.log(await getTimetable(id));
-}
+async function loadTimetable({ id, name }: Station) {
+  clearChildElements(stationsListElement);
+  clearChildElements(timeTableElement);
+  searchElement.value = name;
 
-//   const result = <HTMLDivElement>document.querySelector('#result');
+  const date = new Date();
+  const hour = date.getHours();
+  const yymmdd = date.toISOString().slice(2, 10).replaceAll('-', '');
+
+  const timeTableData = await getTimetable(id, yymmdd, hour);
+  timeTableData.forEach((timeTableItem) => {
+    const departureTime = `${timeTableItem.hour}:${timeTableItem.minute}`;
+    const departureTrainNumber = timeTableItem.trainNumber;
+    const departureDestination = timeTableItem.destination;
+    const departureTrainNextStops = timeTableItem.nextStops.join(' - ');
+
+    timeTableElement.append(
+      createElement('div', { innerText: departureTime }),
+      createElement('div', { innerText: departureTrainNumber }),
+      createElement('div', {
+        innerText: departureDestination,
+        childElements: [
+          createElement('div', {
+            innerText: departureTrainNextStops,
+            className: 'nextStops',
+          }),
+        ],
+      })
+    );
+  });
+
+  if (timeTableData.length > 0)
+    stationsListElement.classList.add('stations--hidden');
+}

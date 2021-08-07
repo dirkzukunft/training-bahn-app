@@ -31,6 +31,10 @@
   border: 1px solid var(--clr-border);
 }
 
+.search:focus {
+  outline: var(--clr-accent) solid 1px;
+}
+
 .stations {
   position: absolute;
   margin-left: -20rem;

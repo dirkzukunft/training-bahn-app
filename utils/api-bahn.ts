@@ -61,11 +61,18 @@ export async function getTimetable(
           day: resultElement.dp.pt.slice(4, 6),
           hour: resultElement.dp.pt.slice(6, 8),
           minute: resultElement.dp.pt.slice(8, 10),
-          destination: resultElement.dp.ppth.split('|').slice(-1)[0],
+          destination: resultElement.dp.ppth
+            .split('|')
+            .slice(-1)[0]
+            .replaceAll('(', ' (')
+            .replaceAll(')', ') '),
           trainNumber: `${resultElement.tl.c ?? ''} ${
             resultElement.dp.l ?? ''
           }`,
-          nextStops: resultElement.dp.ppth.split('|'),
+          nextStops: resultElement.dp.ppth
+            .replaceAll('(', ' (')
+            .replaceAll(')', ') ')
+            .split('|'),
         });
       }
     });
